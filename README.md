@@ -6,7 +6,7 @@
 
 笔记本电脑测试单线程6秒100张pdf电子发票
 
-在线识别页面 http://www.heycore.com/invoice.html
+在线识别页面 http://127.0.0.1:8080
 
 ### 效果预览
 

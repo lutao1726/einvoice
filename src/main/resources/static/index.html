@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>电子发票识别</title>
+    <link href="/static/css/bootstrap.min.css-v=3.3.5.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css-v=4.4.0.css" rel="stylesheet">
+    <link href="/static/css/animate.min.css"  rel="stylesheet">
+    <link href="/static/css/style.min.css-v=4.0.0.css" rel="stylesheet">
+    
+     <script src="/static/js/jquery.min.js"></script>
+ <script src="/static/js/jsrender.min.js"></script>
+</head>
+<body  class="gray-bg">
+<center><h1>电子发票识别</h1></center>
+	<div class="ibox-content">
+		<div class="row">
+             <div class="col-md-4"></div>
+             <div class="col-md-4">
+             <h3 class="m-t-none m-b">选择电子发票文件</h3>
+                <form role="form" id="form1">
+                    <div class="form-group">
+                        <label>电子发票文件</label>
+                        <input type="file" id="file" name="file" class="form-control" accept="application/pdf"/>
+                    </div>
+                   
+                    <div>
+                        <button class="btn btn-sm btn-primary pull-right m-t-n-xs" type="button"><strong>提 交</strong>
+                        </button>
+                       
+                    </div>
+                </form>
+             </div>
+             <div class="col-md-4"></div>
+        </div>
+    </div>
+                      
+	
+	
+	<script id="inv-tpl"  type="text/x-jsrender">
+		<div class="row">
+			<center><h1>{{:title}}</h1></center>
+		</div>
+		<div class="row" >
+			<div class="col-md-4">机器编号：{{:machineNumber}}</div>
+			<div class="col-md-4"></div>
+			<div class="col-md-4">
+				<ul class="unstyled">
+	                <li>发票代码：{{:code}}</li>
+	                <li>发票号码：{{:number}}</li>
+	                <li>开票日期：{{:date}}</li>
+	                <li>校验码:{{:checksum}}</li>
+	           </ul>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-md-6">
+				<p>购买方</p>
+				<ul class="unstyled">
+					<li>名称：{{:buyerName}}</li>
+					<li>纳税人识别号：{{:buyerCode}}</li>
+					<li>地址、电话：{{:buyerAddress}}</li>
+					<li>开户行及账号：{{:buyerAccount}}</li>
+				</ul>
+			</div>
+			<div class="col-md-6">
+			<p>密码区</p>
+			{{:password}}
+			</div>
+		</div>
+		<div class="row">
+			<table class="table table-bordered">
+                            <thead>
+                                <tr>
+				{{if type == '01'}}
+									<th>项目名称</th>
+                                    <th>车牌号</th>
+                                    <th>类型</th>
+                                    <th>通行日期起</th>
+                                    <th>通行日期止</th>
+				{{else}}
+									<th>货物或应税劳务、服务名称</th>
+                                    <th>规格型号</th>
+                                    <th>单位</th>
+                                    <th>数 量</th>
+                                    <th>单 价</th>
+				{{/if}}
+                                    <th>金 额</th>
+                                    <th>税率</th>
+                                    <th>税 额</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+{{if type == '01'}}
+				{{for detailList}}
+                                <tr>
+				
+									<td style="text-align:left">{{: name}}</td>
+                                    <td style="text-align:left">{{: model}}</td>
+                                    <td style="text-align:left">{{: unit}}</td>
+                                    <td style="text-align:left">{{: count}}</td>
+                                    <td style="text-align:left">{{: price}}</td>
+									<td style="text-align:right">{{: amount}}</td>
+                                    <td style="text-align:right">{{: taxRate * 100}}%</td>
+                                    <td style="text-align:right">{{: taxAmount}}</td>
+								</tr>
+				{{/for}}
+{{else}}
+				{{for detailList}}
+								<tr>
+                                    <td style="text-align:left">{{: name}}</td>
+                                    <td style="text-align:left">{{: model}}</td>
+                                    <td style="text-align:left">{{: unit}}</td>
+                                    <td style="text-align:right">{{: count}}</td>
+                                    <td style="text-align:right">{{: price}}</td>
+                                    <td style="text-align:right">{{: amount}}</td>
+                                    <td style="text-align:right">{{: taxRate * 100}}%</td>
+                                    <td style="text-align:right">{{: taxAmount}}</td>
+                                </tr>
+				{{/for}}
+{{/if}}
+								<tr>
+									<td colspan=8>&nbsp;</td>
+								</tr>
+                                <tr>
+                                	<td>合计</td>
+                                	<td colspan="4">&nbsp;</td>
+                                	<td style="text-align:right">{{:amount}}</td>
+                                	<td>&nbsp;</td>
+                                	<td style="text-align:right">{{:taxAmount}}</td>
+                                </tr>
+                                <tr>
+                                	<td>税价合计：</td>
+                                	<td colspan="7">（大写）：{{:totalAmountString}}        （小写）￥{{:totalAmount}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<p>销售方</p>
+				<ul class="unstyled">
+					<li>名称：{{:sellerName}}</li>
+					<li>纳税人识别号：{{:sellerCode}}</li>
+					<li>地址、电话：{{:sellerAddress}}</li>
+					<li>开户行及账号：{{:sellerAccount}}</li>
+				</ul>
+			</div>
+			<div class="col-md-6">
+				<p>备注</p>
+			</div>
+		</div>
+		<div class="row">
+             <div class="col-md-4">收款人：{{:payee}}</div>
+             <div class="col-md-4">复核：{{:reviewer}}</div>
+             <div class="col-md-4">开票人：{{:drawer}}</div>
+        </div>
+        </script>
+    <div class="ibox-content" id="detail" style="width: 80%; margin: 0 auto;">
+	</div>
+        
+  
+   
+
+ <script  type="text/javascript">
+ $(".btn-sm").click(function () {
+    
+ 		if($("#file").val() == "")
+ 		{
+ 			alert("请选择文件！")
+ 			return false;
+ 		}else
+ 		{
+ 			var fd = new FormData(document.getElementById("form1"));
+ 			 $.ajax({
+	 				url: "/invoice/extrat",
+	 			  	type: "POST",
+	 			  	data: fd,
+	 			  	dataType: "json",
+	 			  	processData: false,  // 不处理数据
+	 			  	contentType: false,   // 不设置内容类型
+	 			 	success: function (data) {
+	 			 		//alert(JSON.stringify(data));
+	 			 		$("#detail").empty();
+	 			 		var tpl = $.templates("#inv-tpl");
+	 			 		
+	 			 		//处理一下数据
+	 			 		
+	 			 		// data.mmq = data.mmq.replace("<","&lt;");
+	 			 		// data.mmq = data.mmq.replace(">","&gt;");
+	 			 		// data.mmq = data.mmq.replace(/\n/g,"<br>");
+	 			 		$('#detail').append(tpl.render(data));
+	 			 		
+	 			 		
+	 			 		//alert(JSON.stringify(invTmp.render(data)));
+	 			 			
+	             	},
+	             	error: function(xhr, status, response)
+	             	{
+	             		alert(xhr.responseText);
+	             	}
+	
+ 				});
+ 			}
+ 	});
+ </script>
+ 
+</body>
+</html>

@@ -4,29 +4,101 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Invoice {
+    /**
+     * 发票标题
+     */
     private String title;
+    /**
+     * 机器编号
+     */
     private String machineNumber;
+    /**
+     * 发票代码
+     */
     private String code;
+    /**
+     * 发票号码
+     */
     private String number;
+    /**
+     * 发票日期
+     */
     private String date;
+    /**
+     * 校验码
+     */
     private String checksum;
+    /**
+     * 买方名称
+     */
     private String buyerName;
+    /**
+     * 买方税号
+     */
     private String buyerCode;
+    /**
+     * 买方地址
+     */
     private String buyerAddress;
+    /**
+     * 买方账号
+     */
     private String buyerAccount;
+    /**
+     * 密码
+     */
     private String password;
+    /**
+     * 金额
+     */
     private BigDecimal amount;
+    /**
+     * 税额
+     */
     private BigDecimal taxAmount;
+    /**
+     * 合计金额
+     */
     private String totalAmountString;
+    /**
+     * 合计金额
+     */
     private BigDecimal totalAmount;
+    /**
+     * 卖家名称
+     */
     private String sellerName;
+    /**
+     * 卖家税号
+     */
     private String sellerCode;
+    /**
+     * 卖家地址
+     */
     private String sellerAddress;
+    /**
+     * 卖家账号
+     */
     private String sellerAccount;
+    /**
+     * 收款人
+     */
     private String payee;
+    /**
+     * 复核人
+     */
     private String reviewer;
+    /**
+     * 开票人
+     */
     private String drawer;
+    /**
+     * 类型
+     */
     private String type;
+    /**
+     * 明细
+     */
     private List<Detail> detailList;
 
     /**
