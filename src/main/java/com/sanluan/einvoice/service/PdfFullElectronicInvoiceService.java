@@ -33,8 +33,13 @@ public class PdfFullElectronicInvoiceService {
     public static Invoice getFullElectronicInvoice(String fullText, String allText, int pageWidth, PDDocument doc, PDPage firstPage ) throws IOException {
         Invoice invoice = new Invoice();
         {
-            String reg = "发票号码:(?<number>\\d{20})|:(?<date>\\d{4}年\\d{2}月\\d{2}日)|购名称:(?<buyerName>[\\u4e00-\\u9fa5]+公司)|销名称:(?<sellerAccount>[\\u4e00-\\u9fa5]+公司)";
-
+//            String reg = "发票号码:(?<number>\\d{20})|:(?<date>\\d{4}年\\d{2}月\\d{2}日)|购名称:(?<buyerName>[\\u4e00-\\u9fa5]+公司)|销名称:(?<sellerAccount>[\\u4e00-\\u9fa5]+公司)";
+            String reg = "(?:" +
+                    "发票号码:(?<number>\\d{20})|" +
+                    "开票日期:(?<date>\\d{4}年\\d{2}月\\d{2}日)|" +
+                    "(?:购\\s*名称|购买方名称):(?<buyerName>.+?)(?=(?:销名称|\\s|$))|" +  // 关键修改
+                    "销名称:(?<sellerAccount>[^\\s：]+)" +  // 兼容非中文公司名
+                    ")";
             Pattern pattern = Pattern.compile(reg);
             Matcher matcher = pattern.matcher(allText);
             while (matcher.find()) {
@@ -62,6 +67,10 @@ public class PdfFullElectronicInvoiceService {
                 }else {
                     invoice.setSellerCode(matcher.group(1));
                 }
+            }
+            if(invoice.getSellerCode() == null&&invoice.getBuyerCode()!=null&&invoice.getSellerName().contains("公司")){
+                invoice.setSellerCode(invoice.getBuyerCode());
+                invoice.setBuyerCode("");
             }
         }
         {
