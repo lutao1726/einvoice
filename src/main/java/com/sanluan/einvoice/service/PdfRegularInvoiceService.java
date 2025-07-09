@@ -8,10 +8,8 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,13 +132,16 @@ public class PdfRegularInvoiceService {
         stripper.setSortByPosition(true);
         PDFTextStripperByArea detailStripper = new PDFTextStripperByArea();
         detailStripper.setSortByPosition(true);
+        if(!positionListMap.isEmpty())
         {
-            Position machineNumber;
-            if (positionListMap.get("机器编号").size() > 0) {
+            Position machineNumber = new Position();
+            if (Objects.nonNull(positionListMap.get("机器编号"))&&positionListMap.get("机器编号").size() > 0) {
                 machineNumber = positionListMap.get("机器编号").get(0);
             } else {
-                machineNumber = positionListMap.get("开票日期").get(0);
-                machineNumber.setY(machineNumber.getY() + 30);
+                if(Objects.nonNull(positionListMap.get("开票日期"))){
+                    machineNumber = positionListMap.get("开票日期").get(0);
+                    machineNumber.setY(machineNumber.getY() + 30);
+                }
             }
             Position taxRate = positionListMap.get("税率").get(0);
             Position totalAmount = positionListMap.get("价税合计").get(0);
@@ -191,11 +192,13 @@ public class PdfRegularInvoiceService {
                 stripper.addRegion("detailPrice", new Rectangle(x, y, pageWidth, h));
             }
             {
-                int x = maqX + 10;
-                int y = Math.round(machineNumber.getY()) + 10;
-                int w = pageWidth - maqX - 10;
-                int h = Math.round(taxRate.getY() - 5) - y;
-                stripper.addRegion("password", new Rectangle(x, y, w, h));
+                if(Objects.nonNull(machineNumber)){
+                    int x = maqX + 10;
+                    int y = Math.round(machineNumber.getY()) + 10;
+                    int w = pageWidth - maqX - 10;
+                    int h = Math.round(taxRate.getY() - 5) - y;
+                    stripper.addRegion("password", new Rectangle(x, y, w, h));
+                }
             }
             {
                 int x = Math.round(buyer.getX()) - 15; // 开户行及账号的x为参考
@@ -215,9 +218,11 @@ public class PdfRegularInvoiceService {
         stripper.extractRegions(firstPage);
         detailStripper.extractRegions(firstPage);
         doc.close();
-
-        invoice.setPassword(StringUtils.trim(stripper.getTextForRegion("password")));
-
+        try {
+            invoice.setPassword(StringUtils.trim(stripper.getTextForRegion("password")));
+        }catch (Exception e){
+            invoice.setPassword("");
+        }
         String reg = "名称:(?<name>\\S*)|纳税人识别号:(?<code>\\S*)|地址、电话:(?<address>\\S*)|开户行及账号:(?<account>\\S*)|电子支付标识:(?<account2>\\S*)";
         {
             String buyer = replace(stripper.getTextForRegion("buyer"));

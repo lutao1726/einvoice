@@ -138,7 +138,7 @@ public class PdfFullElectronicInvoiceService {
         }
         PDFKeyWordPosition kwp = new PDFKeyWordPosition();
         Map<String, List<Position>> positionListMap = kwp
-                .getCoordinate(Arrays.asList("机器编号", "税率", "价税合计", "合计", "开票日期", "规格型号", "车牌号", "开户行及账号", "密", "码", "区"), doc);
+                .getCoordinate(Arrays.asList("机器编号", "税率", "价税合计", "合计", "开票日期", "规格型号", "车牌号", "开户行及账号", "密", "码", "区","合"), doc);
 
         PDFTextStripperByArea stripper = new PDFTextStripperByArea();
         stripper.setSortByPosition(true);
@@ -153,8 +153,8 @@ public class PdfFullElectronicInvoiceService {
                 machineNumber.setY(machineNumber.getY() + 30);
             }
             Position taxRate = positionListMap.get("税率").get(0);
-            Position totalAmount = positionListMap.get("价税合计").get(0);
-            Position amount = positionListMap.get("合计").get(0);
+//            Position totalAmount =positionListMap.get("价税合计")!=null?positionListMap.get("价税合计").get(0):null;
+            Position amount = !positionListMap.get("合计").isEmpty() ?positionListMap.get("合计").get(0):positionListMap.get("合").get(0);
             Position model = null;
             if (!positionListMap.get("规格型号").isEmpty()) {
                 model = positionListMap.get("规格型号").get(0);
@@ -187,10 +187,19 @@ public class PdfFullElectronicInvoiceService {
                 detail.setName("");
                 String[] itemArray = StringUtils.split(detailString, " ");
                 if (2 == itemArray.length) {
-                    detail.setAmount(new BigDecimal(itemArray[0]));
-                    detail.setTaxAmount(new BigDecimal(itemArray[1]));
+                    if(itemArray[0].contains("¥")){
+                        detail.setAmount(new BigDecimal(itemArray[0].replace("¥", "")));
+                    }else {
+                        detail.setAmount(new BigDecimal(itemArray[0]));
+                    }
+                    if(itemArray[0].contains("¥")){
+                        detail.setTaxAmount(new BigDecimal(itemArray[1].replace("¥", "")));
+                    }else {
+                        detail.setTaxAmount(new BigDecimal(itemArray[1]));
+                    }
+
                     detailList.add(detail);
-                } else if (2 < itemArray.length) {
+                } else if (2 < itemArray.length&&isValidBigDecimal(itemArray[itemArray.length - 3])) {
                     detail.setAmount(new BigDecimal(itemArray[itemArray.length - 3]));
                     String taxRate = itemArray[itemArray.length - 2];
                     if (taxRate.indexOf("免税") > 0 || taxRate.indexOf("不征税") > 0 || taxRate.indexOf("出口零税率") > 0
@@ -269,5 +278,16 @@ public class PdfFullElectronicInvoiceService {
             invoice.setDetailList(detailList);
         }
         return invoice;
+    }
+    public static boolean isValidBigDecimal(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            new BigDecimal(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
