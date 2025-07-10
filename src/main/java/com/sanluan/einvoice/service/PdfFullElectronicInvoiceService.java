@@ -8,12 +8,11 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import java.awt.*;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.sanluan.einvoice.utils.StringUtils.replace;
 
@@ -275,7 +274,7 @@ public class PdfFullElectronicInvoiceService {
                 i++;
                 m++;
             }
-            invoice.setDetailList(detailList);
+            invoice.setDetailList(detailList.stream().filter(detail -> (Objects.nonNull(detail.getName())&&Objects.nonNull(detail.getTaxRate()))).collect(Collectors.toList()));
         }
         return invoice;
     }
